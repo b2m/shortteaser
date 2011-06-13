@@ -33,7 +33,7 @@ class ShortTeaser extends Frontend
      * its teaser should be shortened
      *
      * @param object &$objTemplate containing template information
-     * @param object $objArticles  containing newsdata 
+     * @param object $objArticles  containing newsdata
      *
      * @uses $GLOBALS['TL_CONFIG']['shortTeaserHTML']
      *
@@ -69,7 +69,7 @@ class ShortTeaser extends Frontend
             return false;
         }
         $this->debug('Found ModuleNewsList and shortTeaser active.', __METHOD__);
-        
+
         $shortTeaserShorten = unserialize($mod->shortTeaserShorten);
         $type = $shortTeaserShorten['unit'];
         $count = $shortTeaserShorten['value'];
@@ -77,7 +77,9 @@ class ShortTeaser extends Frontend
         $teaser = $objTemplate->teaser;
         $full = $objTemplate->text;
         $id = $objTemplate->id;
-        
+
+        $text = "";
+
         switch ($mod->shortTeaserSource) {
         case 'teaser':
             $this->debug('Using teaser as source.', __METHOD__);
@@ -113,7 +115,7 @@ class ShortTeaser extends Frontend
             return false;
             break;
         }
-        
+
         $new_text = $text;
         // check if shortening is activ
         if ($count>0) {
@@ -278,7 +280,7 @@ class ShortTeaser extends Frontend
             $text .= '</'.$tag.'>';
             $this->debug('Add missing closing tag '.$tag.'.', __METHOD__);
         }
-        return $text; 
+        return $text;
     }
 
     /**
@@ -402,6 +404,8 @@ class ShortTeaser extends Frontend
      */
     protected function getSections($text, $count, $id)
     {
+        // headlines
+        $hl = array();
         // search for type of first heading
         preg_match('#<h([1-6])[^>]*?>#', $text, $matches, PREG_OFFSET_CAPTURE);
         // search all html tags and consider them
