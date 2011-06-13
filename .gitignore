@@ -11,6 +11,7 @@ cache/** /*
 tmp/** /*
 test
 docs
+nbproject
 
 # logs and dbs
 *.log
