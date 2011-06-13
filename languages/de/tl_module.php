@@ -44,7 +44,7 @@ $GLOBALS['TL_LANG']['tl_module']['shortTeaserSource']
 $GLOBALS['TL_LANG']['tl_module']['shortTeaserShorten']
     = array(
             'Kürze Teaser',
-            'Wie soll der Vorschautext gekürzt werden?'\
+            'Wie soll der Vorschautext gekürzt werden?'
            .' Leer lassen um die Kürzung zu deaktivieren.'
             );
 

@@ -22,7 +22,7 @@ if (!defined('TL_ROOT')) die('You can not access this file directly!');
 $GLOBALS['TL_DCA']['tl_settings']['palettes']['default']
     = str_replace(
         ';{search_legend:hide}',
-        ';{shortTeaser_legend:hide},shortTeaserHTML;{search_legend:hide}',
+        ';{shortTeaser_legend:hide},shortTeaserHTML,shortTeaserDebug;{search_legend:hide}',
         $GLOBALS['TL_DCA']['tl_settings']['palettes']['default']
     );
 
@@ -41,5 +41,16 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['shortTeaserHTML']
                                  'tl_class'        => 'long',
                                  'nospace'         => true,
                                  'mandatory'       => true)
+    );
+/**
+ * Add debug field to tl_settings
+ * @global array $GLOBALS['TL_DCA']['tl_settings']['fields']['shortTeaserDebug'] 
+ * @name $fields['shortTeaserHTML']
+ */
+$GLOBALS['TL_DCA']['tl_settings']['fields']['shortTeaserDebug']
+    = array(
+            'label'     => &$GLOBALS['TL_LANG']['tl_settings']['shortTeaserDebuglabel'],
+            'exclude'   => true,
+            'inputType' => 'checkbox'
     );
 ?>

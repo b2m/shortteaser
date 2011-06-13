@@ -24,13 +24,24 @@ $GLOBALS['TL_LANG']['tl_settings']['shortTeaser_legend']
 
 /**
  * Description for setting field shortTeaserHTML
- * @global array $GLOBALS['TL_LANG']['tl_settings']['shortTeaserHTML'] 
- * @name $TL_LANG['tl_settings']['shortTeaserHTML']
+ * @global array $GLOBALS['TL_LANG']['tl_settings']['shortTeaserHTMLlabel'] 
+ * @name $TL_LANG['tl_settings']['shortTeaserHTMLlabel']
  */
 $GLOBALS['TL_LANG']['tl_settings']['shortTeaserHTMLlabel']
     = array(
             'Erlaubte HTML Tags im Vorschautext',
             'Hier sind die erlaubten HTML Tags für Vorschautexte einzutragen.'
            .' Alle anderen Tags werden entfernt.'
+            );
+
+/**
+ * Description for setting field shortTeaserDebug
+ * @global array $GLOBALS['TL_LANG']['tl_settings']['shortTeaserDebuglabel'] 
+ * @name $TL_LANG['tl_settings']['shortTeaserDebuglabel']
+ */
+$GLOBALS['TL_LANG']['tl_settings']['shortTeaserDebuglabel']
+    = array(
+            'Debugmodus aktivieren',
+            'Aktiviert weitere Nachrichten im System Log'
             );
 ?>

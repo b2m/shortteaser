@@ -35,7 +35,7 @@ class ShortTeaser extends Frontend
      * @param object &$objTemplate containing template information
      * @param object $objArticles  containing newsdata 
      *
-     * @use $GLOBALS['TL_CONFIG']['shortTeaserHTML']
+     * @uses $GLOBALS['TL_CONFIG']['shortTeaserHTML']
      *
      * @return boolean
      */
@@ -45,13 +45,30 @@ class ShortTeaser extends Frontend
         foreach (debug_backtrace() as $b) {
             if ($b['class'] == 'ModuleNewsList') {
                 $mod = $b['object'];
-                break;
+                 break;
             }
         }
 
-        if ($mod===false || $mod->shortTeaser!=1) {
+        if ($mod===false || !is_object($mod) || $mod->shortTeaser!=1) {
+            if ($mod===false) {
+                $this->debug(
+                    'No parent ModuleNewsList found!',
+                    __METHOD__
+                );
+            } else if (!is_object($mod)) {
+                $this->debug(
+                    'No object found, we need PHP Version > 5.1.0!',
+                    __METHOD__
+                );
+            } else {
+                $this->debug(
+                    'shortTeaser not active!',
+                    __METHOD__
+                );
+            }
             return false;
         }
+        $this->debug('Found ModuleNewsList and shortTeaser active.', __METHOD__);
         
         $shortTeaserShorten = unserialize($mod->shortTeaserShorten);
         $type = $shortTeaserShorten['unit'];
@@ -63,26 +80,36 @@ class ShortTeaser extends Frontend
         
         switch ($mod->shortTeaserSource) {
         case 'teaser':
+            $this->debug('Using teaser as source.', __METHOD__);
             $text = $this->checkHTML($teaser);
             break;
         case 'full':
+            $this->debug('Using fulltext as source.', __METHOD__);
             $text = $this->checkHTML($full);
             break;
         case 'teaser_or_full':
             if (strlen($teaser)>0) {
+                $this->debug('Using teaser as source.', __METHOD__);
                 $text = $this->checkHTML($teaser);
             } else {
+                $this->debug('Using fulltext as source.', __METHOD__);
                 $text = $this->checkHTML($full);
             }
             break;
         case 'full_no_teaser':
             if (strlen($teaser)===0) {
+                $this->debug('Using fulltext as source.', __METHOD__);
                 $text = $this->checkHTML($full);
             } else {
+                $this->debug('Using uncut teaser as source.', __METHOD__);
                 $text = $teaser;
             }
             break;
         default:
+            $this->debug(
+                'Unknown value for shortTeaserSource!',
+                __METHOD__, TL_ERROR
+            );
             return false;
             break;
         }
@@ -92,25 +119,34 @@ class ShortTeaser extends Frontend
         if ($count>0) {
             switch ($type) {
             case 'chars':
+                $this->debug('Short text to '.$count.' chars.', __METHOD__);
                 $new_text = $this->getChars($text, $count, $id);
                 // add some chars like ...
                 $new_text.= $GLOBALS['TL_LANG']['MSC']['shortTeaserEnd'];
                 break;
             case 'words':
+                $this->debug('Short text to '.$count.' words.', __METHOD__);
                 $new_text = $this->getWords($text, $count, $id);
                 // add some chars like ...
                 $new_text.= $GLOBALS['TL_LANG']['MSC']['shortTeaserEnd'];
                 break;
             case 'sentences':
+                $this->debug('Short text to '.$count.' sentences.', __METHOD__);
                 $new_text = $this->getSentences($text, $count, $id);
                 break;
             case 'paragraphs':
+                $this->debug('Short text to '.$count.' paragraphs.', __METHOD__);
                 $new_text = $this->getParagraphs($text, $count, $id);
                 break;
             case 'sections':
+                $this->debug('Short text to '.$count.' sections.', __METHOD__);
                 $new_text = $this->getSections($text, $count, $id);
                 break;
             default:
+                $this->debug(
+                    'Unknown value for shortTeaserShorten!',
+                    __METHOD__, TL_ERROR
+                );
                 break;
             }
         }
@@ -143,6 +179,7 @@ class ShortTeaser extends Frontend
      * @param int    $id    the id of the news item
      *
      * @uses $GLOBALS['TL_LANG']['MSC']['shortTeaserEnd']
+     * @uses $GLOBALS['TL_CONFIG']['shortTeaserHTML']
      *
      * @return string new teaser html code
      */
@@ -152,6 +189,12 @@ class ShortTeaser extends Frontend
         $real_count = $count;
         // working copy of $text
         $stext = $text;
+        // ignoring empty html elements
+        $empty_tags = str_replace(
+            array('<img>','<br>','<input>','<hr>'),
+            '',
+            $GLOBALS['TL_CONFIG']['shortTeaserHTML']
+        );
         // tag stack to add missing closing tags
         $tag_stack = array();
         // internal counter for while
@@ -171,22 +214,40 @@ class ShortTeaser extends Frontend
                     $message  = 'Closing tag "'.htmlentities($$matches[2][0]).'"';
                     $message .= ' found in News with id '.$id.' but no';
                     $message .= ' corresponding opening tag before.';
-                    $this->log($message, __CLASS__.' '.__METHOD__, TL_ERROR);
+                    $this->debug($message, __METHOD__, TL_ERROR);
                 } else {
                     // remove last corresponding opening tag
+                    $this->debug(
+                        'Found closing tag '.$matches[2][0].'.',
+                        __METHOD__
+                    );
                     unset($tag_stack[count($tag_stack)-$res-1]);
                 }
             } else if ($cm > 3) {
                 // opening tag
-                if ($matches[0][0][-2] != '/') {
+
+                // remove empty tags
+                $tag = strip_tags($matches[0][0], $empty_tags);
+                if (strlen($tag)>0) {
                     // add opening tags to $tag_stack
                     array_push($tag_stack, $matches[3][0]);
+                    $this->debug(
+                        'Found opening tag '.$matches[3][0].'.',
+                        __METHOD__
+                    );
+                } else {
+                    $message = 'Found tag '.$matches[3][0]
+                              .' but ignoring tag_stack.';
+                    $this->debug(
+                        $message,
+                        __METHOD__
+                    );
                 }
             } else {
                 $message  = 'You may inform the developer of the module';
                 $message .= ' '.__CLASS__.' that error 42 occured.';
                 $message .= ' But this will never happen =)';
-                $this->log($message, __CLASS__.' '.__METHOD__, TL_ERROR);
+                $this->debug($message, __METHOD__, TL_ERROR);
             }
             // get length of match
             $matchlength = strlen($matches[0][0]);
@@ -198,11 +259,24 @@ class ShortTeaser extends Frontend
             // cut already checked text
             $stext = substr($stext, $end_pos);
         }
+        if (strlen($text)<=$real_count) {
+            $this->debug(
+                'Nothing to short cause text has '.strlen($text)
+                .' chars, '.$real_count.' allowed!',
+                __METHOD__
+            );
+        } else {
+            $this->debug(
+                'Short Teaser to calculated '.$real_count.' chars.',
+                __METHOD__
+            );
+        }
         // now cut real text
         $text = substr($text, 0, $real_count);
         // add missing closing tags in reverse order
         foreach (array_reverse($tag_stack) as $tag) {
             $text .= '</'.$tag.'>';
+            $this->debug('Add missing closing tag '.$tag.'.', __METHOD__);
         }
         return $text; 
     }
@@ -233,6 +307,10 @@ class ShortTeaser extends Frontend
         }
         // calculate position of last word
         $pos = array_sum(array_map('strlen', $words))+count($words)-1;
+        $this->debug(
+            'Reducing to '.count($words).' words is equal to '.$pos.' chars.',
+            __METHOD__
+        );
         // now use getChars()
         return $this->getChars($text, $pos, $id);
     }
@@ -264,6 +342,11 @@ class ShortTeaser extends Frontend
         }
         // calculate position of last sentence with .,? or ! at the end
         $pos = array_sum(array_map('strlen', $sentences))+count($sentences);
+        $this->debug(
+            'Reducing to '.count($sentences).' sentences'
+            .' is equal to '.$pos.' chars.',
+            __METHOD__
+        );
         // now use getChars()
         return $this->getChars($text, $pos, $id);
     }
@@ -295,6 +378,11 @@ class ShortTeaser extends Frontend
         $paragraphs = array_map('strip_tags', $paragraphs);
         // calculate position of last paragraph
         $pos = array_sum(array_map('strlen', $paragraphs));
+        $this->debug(
+            'Reducing to '.count($paragraphs).' paragraphs'
+            .' is equal to '.$pos.' chars.',
+            __METHOD__
+        );
         // now use getChars()
         return $this->getChars($text, $pos, $id);
     }
@@ -342,8 +430,32 @@ class ShortTeaser extends Frontend
         $sections = array_map('strip_tags', $sections);
         // calculate position of last section
         $pos = array_sum(array_map('strlen', $sections));
+        $this->debug(
+            'Reducing to '.count($sections).' sections is equal to '.$pos.' chars.',
+            __METHOD__
+        );
         // now use getChars()
         return $this->getChars($text, $pos, $id);
+    }
+
+    /**
+     * Debug to system log
+     *
+     * Logs the debug message to the system log
+     *
+     * @param string $message text to log
+     * @param string $method  caller method
+     * @param string $type    type for logging message
+     *
+     * @uses $GLOBALS['TL_CONFIG']['shortTeaserDebug']
+     *
+     * @return boolean
+     */
+    protected function debug($message, $method, $type=TL_GENERAL)
+    {
+        if ($type==TL_ERROR || $GLOBALS['TL_CONFIG']['shortTeaserDebug']==1) {
+            $this->log($message, __CLASS__.' '.$method, $type);
+        }
     }
 }
 

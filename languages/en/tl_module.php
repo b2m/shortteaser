@@ -44,8 +44,7 @@ $GLOBALS['TL_LANG']['tl_module']['shortTeaserSource']
 $GLOBALS['TL_LANG']['tl_module']['shortTeaserShorten']
     = array(
             'Shorten Teaser',
-            'Choose how the teaser should be shortened.'\
-           .' Leave empty to refuse shortening.'
+            'Choose how the teaser should be shortened. Leave empty to refuse shortening.'
             );
 
 $GLOBALS['TL_LANG']['tl_module']['shortTeaserShortenOptions']
