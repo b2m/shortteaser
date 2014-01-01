@@ -50,7 +50,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['shortTeaser']
             'label'     => &$GLOBALS['TL_LANG']['tl_module']['shortTeaser'],
             'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval'      => array('submitOnChange'=>true)
+            'eval'      => array('submitOnChange'=>true),
+            'sql'       => "char(1) NOT NULL default ''"
     );
 
 /**
@@ -68,7 +69,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['shortTeaserSource']
                                  'teaser_or_full',
                                  'full_no_teaser'),
             'reference' => &$GLOBALS['TL_LANG']['tl_module']['shortTeaserSourceOptions'],
-            'eval'      => array('tl_class'=>'w50')
+            'eval'      => array('tl_class'=>'w50'),
+            'sql'       => "varchar(25) NOT NULL default ''"
     );
 
 /**
@@ -90,5 +92,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['shortTeaserShorten']
             'eval'      => array('maxlength'=>4,
                                  'rgxp'=>'digit',
                                  'nospace'=>true,
-                                 'tl_class'=>'w50')
+                                 'tl_class'=>'w50'),
+            'sql'       => "varchar(100) NOT NULL default ''"
     );

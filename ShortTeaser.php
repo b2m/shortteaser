@@ -43,7 +43,7 @@ class ShortTeaser extends Frontend
     {
         $mod = false;
         foreach (debug_backtrace() as $b) {
-            if ($b['class'] == 'ModuleNewsList') {
+            if ($b['class'] == 'Contao\ModuleNewsList') {
                 $mod = $b['object'];
                  break;
             }

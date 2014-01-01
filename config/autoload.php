@@ -15,10 +15,11 @@
 if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
- * Add ShortTeaser class to Hook
- * @global array $GLOBALS['TL_HOOKS']['parseArticles']['ShortTeaser']['shortNewsTeaser']
- * @name $TL_HOOKS['replaceInsertTags']['ShortTeaser']['shortNewsTeaser']
+ * Register Classes
  */
-$GLOBALS['TL_HOOKS']['parseArticles'][] = array('ShortTeaser', 'shortNewsTeaser');
+ClassLoader::addClasses(array
+(
+ 'ShortTeaser'      => 'system/modules/shortteaser/ShortTeaser.php'
+));
 
 ?>
